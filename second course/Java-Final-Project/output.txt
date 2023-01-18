@@ -1,0 +1,6 @@
+- Input ----------------
+-272 
+Decoded --------------
+Zkt4e09FS1QxR1Z4T2hGU1hocGJxclpMM2hyblJKWnlWTkNKVjJPQ1Q5RkpCSGtyQ2NoPg==
+- Encoded --------------
+122 - 34 - 3* (55 + 5* (3 - 2)) * 2
