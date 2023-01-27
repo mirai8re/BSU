@@ -24,8 +24,7 @@ class StateMachineTest {
         String expressionText = "122/0";
         List<StateMachine.Lexeme> lexemes = lexAnalyze(expressionText);
         StateMachine.LexemeBuffer lexemeBuffer = new StateMachine.LexemeBuffer(lexemes);
-        int actual = expr(lexemeBuffer);
-        assertEquals("Division by zero", actual);
+        assertEquals("Division by zero", expr(lexemeBuffer));
     }
 
     @org.junit.jupiter.api.Test
