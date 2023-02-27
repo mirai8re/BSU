@@ -1,0 +1,30 @@
+use Ucheb_7_Mironova
+SELECT * 
+FROM Products
+WHERE (Manufacturer='Samsung') OR (Price>50000)
+
+use Ucheb_7_Mironova
+SELECT 
+    ID,
+    ProductName,
+    Manufacturer,
+    ProductCount,
+    Price
+FROM Products
+WHERE Price > 45000
+
+use Ucheb_7_Mironova
+SELECT 
+    ID,
+    ProductName,
+    Manufacturer,
+    ProductCount,
+    Price
+FROM Products
+WHERE Price*ProductCount > 200000
+
+
+use Ucheb_7_Mironova
+SELECT * 
+FROM Products
+WHERE (Price*ProductCount) BETWEEN 100000 AND 2000000
