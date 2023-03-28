@@ -1,0 +1,41 @@
+-- task 2.1
+USE TestDB
+CREATE TABLE t1(
+ID INT DEFAULT 1,
+CONSTRAINT check_ID CHECK (ID is NOT NULL)
+)
+
+INSERT into t1
+VALUES(10)
+
+-- task 2.2
+UPDATE t1
+SET ID = null
+
+-- task 2.3
+CREATE TABLE t2(
+    id INT DEFAULT 1 NOT NULL,
+    vcName VARCHAR(50) NOT NULL,
+    dBD DATETIME,
+    CONSTRAINT CK_birtDate
+    CHECK(dBD> '01-01-1990' AND dBD< GETDATE())
+)
+
+-- task 2.4 
+use TestDB
+CREATE TABLE tt4(
+    id INT DEFAULT 1 NOT NULL,
+    vcName VARCHAR(50) NOT NULL,
+    dBD DATETIME,
+    dDD DATETIME,
+    CONSTRAINT CK_Dbd
+    CHECK (dDD > dBD AND dBD < GETDATE())
+)
+
+-- task 2.5
+CREATE table t5(
+    ID INT DEFAULT 1,
+    CONSTRAINT check_ID_again CHECK(ID is not null),
+    CONSTRAINT uID
+    UNIQUE NONCLUSTERED(ID)
+)
