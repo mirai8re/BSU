@@ -1,0 +1,27 @@
+.settings-container {
+  width: 100%;
+  display: flex;
+  overflow: auto;
+  min-height: 100vh;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #9b9bcb;
+}
+.settings-navlink {
+  display: contents;
+}
+.settings-icon {
+  top: 67px;
+  left: 52px;
+  width: 70px;
+  height: 60px;
+  position: absolute;
+  text-decoration: none;
+}
+.settings-navlink1 {
+  left: 74px;
+  bottom: 77px;
+  position: absolute;
+  text-decoration: none;
+}
