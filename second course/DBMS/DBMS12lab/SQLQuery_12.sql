@@ -11,7 +11,6 @@ VALUES
   (10, 7, '2223 Pine St', 'Seaside', 'WA', '24680');
 -- • - вывести все данные из таблиц
 EXEC sp_MSforeachtable 'SELECT * FROM ?'
-
 -- • вывести определенные данные, отсортированные в алфавитном порядке по
 -- определенному полю
 SELECT name as PizzaDescription 
@@ -128,8 +127,6 @@ VALUES (14, 1),
 INSERT INTO Orders (OrderID, CustomerID, OrderDate, TotalCost)
 VALUES (12, 2, '2023-04-05 15:00:00', 18.99),
 (13, 3, '2023-04-06 16:00:00', 21.99);
-
-
 -- 7. Измените одну из таблиц вашей БД:
 -- • добавьте по смыслу один столбец
 ALTER TABLE Clients
@@ -155,13 +152,90 @@ SELECT AVG(TotalCost) AS AvgOrderCost
 FROM Orders;
 
 -- 9. Написать 2 запроса на группировку данных, используя оператор GROUP BY
+-- количество пицц каждого типа
+USE PizzaDB
+SELECT PizzaTypeID, COUNT(*) as Count
+FROM Pizza
+GROUP BY PizzaTypeID;
+--средний счет заказа для каждого клиента
+SELECT CustomerID, AVG(TotalCost) as AverageCost
+FROM Orders
+GROUP BY CustomerID;
 -- 10. Написать 2 запроса на фильтрацию групп, используя HAVING.
--- 11. Написать запросы на расширения SQL Server для группировки (ROLLUP, CUBE,
+--список заказов и суммарную стоимость для каждого заказа, у которых суммарная стоимость больше 20 
+SELECT OrderID, SUM(TotalCost) AS TotalCost
+FROM Orders
+GROUP BY OrderID
+HAVING SUM(TotalCost) > 20;
+--выбирает ID клиентов и количество заказов для каждого клиента, у которых есть два или более заказа
+SELECT CustomerID, COUNT(*) AS NumOrders
+FROM Orders 
+GROUP BY CustomerID
+HAVING COUNT(*) >= 2;
+
+-- 11. Написать запросы на расширения SQL Server для группировки (ROLLUP//общий итог и промежуточные, CUBE,
 -- GROUPING SETS, OVER)
+--ROLLUP//общая сумма заказов для каждого клиента и общая суммф заказов для всех клиентов
+SELECT CustomerID, SUM(TotalCost) as Total
+FROM Orders
+GROUP BY ROLLUP(CustomerID)
+--CUBE для получения общего количества заказов по датам, клиентам и итогового количества заказов:
+SELECT CONVERT(date, OrderDate) AS OrderDate, CustomerID, COUNT(*) AS NumOrders
+FROM Orders
+GROUP BY CUBE(CONVERT(date, OrderDate), CustomerID)
+--GROUPING SETS для вычисления суммарной стоимости заказов по дате и по клиенту, а также общую сумму по всем заказам
+SELECT CustomerID, OrderDate, SUM(TotalCost) as Total
+FROM Orders
+GROUP BY GROUPING SETS((CustomerID, OrderDate), CustomerID, OrderDate)
+--средняя стоимость заказа для каждого заказчика, а также для всех заказов в целом
+SELECT CustomerID, OrderDate, TotalCost,
+  AVG(TotalCost) OVER (PARTITION BY CustomerID) AS AvgCustomerOrderCost,
+  AVG(TotalCost) OVER () AS AvgTotalOrderCost
+FROM Orders;
+
 -- 12. Написать запрос на разворачивание данных (PIVOT), отмена разворачивания
 -- (UNPIVOT).
+
+--PIVOT
+--//each row represents a different customer, and each column represents a different order. 
+-- The values in each cell represent the total cost of the order for that customer. 
+-- If a customer did not place an order with a particular order ID, the corresponding cell will be NULL.
+SELECT CustomerID, [1], [2], [3], [4], [5]
+FROM (
+  SELECT CustomerID, OrderID, TotalCost
+  FROM Orders
+) AS SourceTable
+PIVOT (
+  SUM(TotalCost)
+  FOR OrderID IN ([1], [2], [3], [4], [5])
+) AS PivotTable;
+
+--UNPIVOT//transform the data back to its original form
+SELECT CustomerID, OrderID, TotalCost
+FROM (
+  SELECT CustomerID, [1], [2], [3], [4], [5]
+  FROM (
+    SELECT CustomerID, OrderID, TotalCost
+    FROM Orders
+  ) AS SourceTable
+  PIVOT (
+    SUM(TotalCost)
+    FOR OrderID IN ([1], [2], [3], [4], [5])
+  ) AS PivotTable
+) AS PivotedTable
+UNPIVOT (
+  TotalCost FOR OrderID IN ([1], [2], [3], [4], [5])
+) AS UnpivotedTable
+WHERE CustomerID IN (2, 3);--used to filter the results to only show data for customers 2 and 3
+
 -- 13. Написать по два запроса на каждое соединение таблиц: внутреннее, внешнее
 -- левое, внешнее правое, полное внешнее соединение.
+--INNER JOIN
+-- список заказов и соответствующих им клиентов
+SELECT o.OrderID, o.OrderDate, o.TotalCost, c.FirstName
+FROM Orders o
+INNER JOIN Clients c ON o.CustomerID = c.CustomerID;
+
 -- 14. Написать по два запроса на пересечение, разность, объединение таблиц
 -- 15. Написать 4 запроса с использованием подзапросов, используя операторы сравнения,
 -- операторы IN, ANY|SOME и ALL, предикат EXISTS
