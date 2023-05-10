@@ -92,6 +92,7 @@ FROM Addresses
 WHERE [State] IN ('NY', 'CA', 'WA')
 -- 5. Переименуйте одну из таблиц вашей БД
 EXEC sp_rename 'Customers', 'Clients';
+EXEC sp_rename 'Clients', 'Customers';
 -- 6. Добавьте по две записи в каждую из таблиц вашей БД
 -- Add two customers
 INSERT INTO Clients (CustomerID, FirstName, LastName, Email, Phone)
@@ -235,12 +236,189 @@ WHERE CustomerID IN (2, 3);--used to filter the results to only show data for cu
 SELECT o.OrderID, o.OrderDate, o.TotalCost, c.FirstName
 FROM Orders o
 INNER JOIN Clients c ON o.CustomerID = c.CustomerID;
-
+-- список пицц и соответствующих им ингридиенты 
+SELECT *
+FROM PizzaIngredients PI
+INNER JOIN Ingredients I ON PI.IngredientID = I.IngredientID;
+--
+--OUTER JOIN
+--Получить информацию о всех заказах вместе с именем и фамилией заказчика, включая заказы, у которых нет связанного заказчика
+SELECT Orders.OrderID, Orders.CustomerID, Orders.OrderDate, Orders.TotalCost, Clients.FirstName, Clients.LastName
+FROM Orders
+LEFT OUTER JOIN Clients
+ON Orders.CustomerID = Clients.CustomerID;
+--Получить информацию о всех ингредиентах и типах пиццы, включая ингредиенты и типы пиццы, которые не использовались ни в одной пицце.
+SELECT PizzaTypes.Name AS PizzaName, Ingredients.Name AS IngredientName
+FROM PizzaTypes
+LEFT OUTER JOIN PizzaIngredients
+ON PizzaTypes.PizzaTypeID = PizzaIngredients.PizzaID
+LEFT OUTER JOIN Ingredients
+ON PizzaIngredients.IngredientID = Ingredients.IngredientID;
+--
+--LEFT JOIN
+--Получить информацию о всех заказах вместе с именем и фамилией заказчика, включая заказы, у которых нет связанного заказчика
+SELECT Orders.OrderID, Orders.CustomerID, Orders.OrderDate, Orders.TotalCost, Customers.FirstName, Customers.LastName
+FROM Orders
+LEFT JOIN Customers 
+ON Orders.CustomerID = Customers.CustomerID;
+--Получить информацию о всех типах пиццы и их ингредиентах, включая типы пиццы, у которых нет связанных ингредиентов.
+SELECT PizzaTypes.Name AS PizzaName, Ingredients.Name AS IngredientName
+FROM PizzaTypes
+LEFT JOIN PizzaIngredients
+ON PizzaTypes.PizzaTypeID = PizzaIngredients.PizzaID
+LEFT JOIN Ingredients
+ON PizzaIngredients.IngredientID = Ingredients.IngredientID;
+--
+--RIGHT JOIN
+--Cписок всех заказов вместе со всеми заказчиками, которые сделали эти заказы.
+SELECT c.FirstName, c.LastName, o.OrderID
+FROM Customers c
+RIGHT JOIN Orders o
+ON c.CustomerID = o.CustomerID;
+--список всех заказов,все имена и фамилии клиентов, которые делали заказы, а также даты заказов
+SELECT Customers.FirstName, Customers.LastName, Orders.OrderDate
+FROM Customers
+RIGHT JOIN Orders ON Customers.CustomerID = Orders.CustomerID;
+--
+--FULL OUTER JOIN
+--все записи из таблицы Customers и связанных с ними адресов из таблицы Addresses
+SELECT *
+FROM Customers
+FULL OUTER JOIN Addresses
+ON Customers.CustomerID = Addresses.CustomerID;
+--Все записи из таблицы PizzaTypes и связанных с ними ингредиентов из таблицы Ingredients
+SELECT *
+FROM PizzaTypes
+FULL OUTER JOIN PizzaIngredients
+ON PizzaTypes.PizzaTypeID = PizzaIngredients.PizzaID
+FULL OUTER JOIN Ingredients
+ON PizzaIngredients.IngredientID = Ingredients.IngredientID;
 -- 14. Написать по два запроса на пересечение, разность, объединение таблиц
+--Intersection - возвращает только те строки, которые есть в обеих таблицах
+--Найти общих заказчиков, которые оформляли заказы и на Маргариту, и на Пепперони:
+SELECT c.CustomerID, c.FirstName, c.LastName
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+JOIN Pizza p ON o.OrderID = p.PizzaID
+JOIN PizzaTypes pt ON p.PizzaTypeID = pt.PizzaTypeID
+WHERE pt.Name = 'Margherita'
+INTERSECT
+SELECT c.CustomerID, c.FirstName, c.LastName
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+JOIN Pizza p ON o.OrderID = p.PizzaID
+JOIN PizzaTypes pt ON p.PizzaTypeID = pt.PizzaTypeID
+WHERE pt.Name = 'Pepperoni'
+--список клиентов, которые и являются заказчиками, и оставляли заказы
+SELECT Customers.CustomerID, Customers.FirstName, Customers.LastName
+FROM Customers
+INTERSECT
+SELECT Customers.CustomerID, Customers.FirstName, Customers.LastName
+FROM Customers
+JOIN Orders ON Customers.CustomerID = Orders.CustomerID;
+--EXCEPT
+--Найти всех заказчиков, которые еще не делали заказов
+SELECT c.CustomerID, c.FirstName, c.LastName, c.Email, c.Phone
+FROM Customers c
+EXCEPT
+SELECT c.CustomerID, c.FirstName, c.LastName, c.Email, c.Phone
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID;
+--Найти все адреса, которые не были использованы в заказах.
+SELECT DISTINCT a.Street, a.City, a.State, a.ZipCode
+FROM Addresses a
+EXCEPT
+SELECT DISTINCT a.Street, a.City, a.State, a.ZipCode
+FROM Addresses a
+JOIN Orders o ON a.CustomerID = o.CustomerID;
+--UNION
+-- Найти все адреса заказчиков и адреса, которые не были использованы в заказах.
+SELECT DISTINCT a.Street, a.City, a.State, a.ZipCode
+FROM Addresses a
+JOIN Customers c ON a.CustomerID = c.CustomerID
+UNION
+SELECT DISTINCT a.Street, a.City, a.State, a.ZipCode
+FROM Addresses a
+WHERE a.CustomerID NOT IN (SELECT CustomerID FROM Orders);
+--выбирает имена, фамилии, электронные адреса и телефоны всех клиентов с фамилией 'Doe' или 'Smith'
+SELECT FirstName, LastName, Email, Phone
+FROM Customers
+WHERE LastName = 'Doe'
+UNION
+SELECT FirstName, LastName, Email, Phone
+FROM Customers
+WHERE LastName = 'Smith'
+
 -- 15. Написать 4 запроса с использованием подзапросов, используя операторы сравнения,
 -- операторы IN, ANY|SOME и ALL, предикат EXISTS
+--Найти все заказы, которые были сделаны в тот же день, что и заказ с номером 1.
+SELECT *
+FROM Orders
+WHERE CONVERT(DATE, OrderDate) = (
+  SELECT CONVERT(DATE, OrderDate)
+  FROM Orders
+  WHERE OrderID = 1
+)
+--Найти всех клиентов, у которых есть хотя бы один заказ на сумму больше, чем 20 долларов.
+SELECT *
+FROM Customers
+WHERE CustomerID IN (
+  SELECT CustomerID
+  FROM Orders
+  WHERE TotalCost > 20
+);
+--Найти все виды пицц, которые содержат ингредиент "Mozzarella".
+SELECT *
+FROM PizzaTypes
+WHERE PizzaTypeID IN (
+  SELECT PizzaID
+  FROM PizzaIngredients
+  WHERE IngredientID = (
+    SELECT IngredientID
+    FROM Ingredients
+    WHERE Name = 'Mozzarella'
+  )
+);
+--Найти всех клиентов, у которых есть заказы, и которые проживают в городе, где есть пиццерия
+SELECT *
+FROM Customers
+WHERE EXISTS (
+  SELECT *
+  FROM Addresses
+  WHERE Addresses.CustomerID = Customers.CustomerID
+    AND Addresses.City IN (
+      SELECT City
+      FROM Addresses
+      WHERE CustomerID IN (
+        SELECT CustomerID
+        FROM Orders
+      )
+    )
+);
 -- 16. Написать 4 запроса по строковым функциям
+--Запрос на выборку имен пользователей, где первая буква имени заглавная
+SELECT FirstName FROM Customers WHERE LEFT(FirstName, 1) = UPPER(LEFT(FirstName, 1));
+-- Запрос на выборку адресов, где город начинается на букву "S"
+SELECT City FROM Addresses WHERE LEFT(City, 1) = 'S';
+--Запрос на выборку email, где доменная часть является "yahoo.com"
+SELECT Email FROM Customers WHERE RIGHT(Email, 10) = '@yahoo.com';
+--Запрос на выборку адресов, где улица состоит более чем из одного слова
+SELECT Street FROM Addresses WHERE LEN(Street) - LEN(REPLACE(Street, ' ', '')) > 0;
 -- 17. Написать 4 запроса по числовым функциям
+--среднее значение стоимости всех пицц в заказе
+SELECT ROUND(AVG(TotalCost), 2) AS avg_cost FROM Orders;
+--максимальную и минимальную стоимость пиццы
+SELECT MAX(TotalCost) AS max_cost, MIN(TotalCost) AS min_cost FROM Orders;
+--    квадратный корень стоимости самой дорогой пиццы в заказе
+SELECT SQRT(MAX(TotalCost)) AS max_sqrt FROM Orders;
+--результат деления стоимости самой дорогой пиццы на стоимость самой дешевой пиццы
+SELECT MAX(TotalCost) / MIN(TotalCost) AS cost_ratio FROM Orders;
+
+
+
+
+
+
 -- 18. Создайте 5 представлений по своей БД
 -- 19. Покажите применение табличных переменных, временные локальных и глобальных
 -- таблиц, а так же обобщенных табличных выражений.
