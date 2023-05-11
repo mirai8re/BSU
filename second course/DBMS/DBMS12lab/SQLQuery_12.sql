@@ -413,12 +413,57 @@ SELECT MAX(TotalCost) AS max_cost, MIN(TotalCost) AS min_cost FROM Orders;
 SELECT SQRT(MAX(TotalCost)) AS max_sqrt FROM Orders;
 --результат деления стоимости самой дорогой пиццы на стоимость самой дешевой пиццы
 SELECT MAX(TotalCost) / MIN(TotalCost) AS cost_ratio FROM Orders;
-
-
-
-
-
-
 -- 18. Создайте 5 представлений по своей БД
+--Представление всех заказов конкретного клиента:
+GO
+CREATE VIEW CustomerOrder AS 
+SELECT o.OrderID, o.OrderDate, o.TotalCost, c.FirstName, c.LastName
+FROM Orders o
+JOIN Customers c ON o.CustomerID = c.CustomerID
+WHERE c.FirstName = 'Anna' AND c.LastName = 'Mironova';
+GO
+SELECT * FROM CustomerOrder
+--Представление всех пицц в базе данных, с указанием их ингредиентов:
+GO
+CREATE VIEW PizzaIngredientsList AS
+SELECT p.PizzaID, pt.Name AS PizzaType, i.Name AS Ingredient, i.Description AS IngredientDescription
+FROM Pizza p
+JOIN PizzaTypes pt ON p.PizzaTypeID = pt.PizzaTypeID
+JOIN PizzaIngredients pi ON p.PizzaID = pi.PizzaID
+JOIN Ingredients i ON pi.IngredientID = i.IngredientID;
+GO 
+SELECT * FROM PizzaIngredientsList
+--Представление всех адресов клиентов в определенном штате
+GO 
+CREATE VIEW CustomerAddresses AS
+SELECT c.FirstName, c.LastName, a.Street, a.City, a.State, a.ZipCode
+FROM Customers c
+JOIN Addresses a ON c.CustomerID = a.CustomerID
+WHERE a.State = 'CA';
+GO 
+SELECT * FROM CustomerAddresses
+--Представление всех пицц с указанием количества ингредиентов, необходимых для каждой:
+GO
+CREATE VIEW PizzaIngredientsCount AS
+SELECT p.PizzaID, pt.Name AS PizzaType, COUNT(pi.IngredientID) AS IngredientCount
+FROM Pizza p
+JOIN PizzaTypes pt ON p.PizzaTypeID = pt.PizzaTypeID
+JOIN PizzaIngredients pi ON p.PizzaID = pi.PizzaID
+GROUP BY p.PizzaID, pt.Name;
+GO 
+SELECT * FROM PizzaIngredientsCount
+--Представление будет показывать все ингредиенты, используемые в каждой пицце вместе с их типом пиццы
+GO
+CREATE VIEW PizzaIngredientsView AS
+SELECT p.PizzaID, pt.Name AS PizzaType, i.Name AS Ingredient
+FROM Pizza p
+JOIN PizzaTypes pt ON p.PizzaTypeID = pt.PizzaTypeID
+JOIN PizzaIngredients pi ON p.PizzaID = pi.PizzaID
+JOIN Ingredients i ON pi.IngredientID = i.IngredientID;
+GO
+SELECT * FROM PizzaIngredientsView;
+
+
+
 -- 19. Покажите применение табличных переменных, временные локальных и глобальных
 -- таблиц, а так же обобщенных табличных выражений.
