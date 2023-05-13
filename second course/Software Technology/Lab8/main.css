@@ -1,0 +1,37 @@
+
+.taxi-form {
+    width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #1e4677;
+    font-family: Arial, sans-serif;
+}
+
+.taxi-form h1 {
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #5ca22e;
+    color: white;
+    border-radius: 10px;
+    /*border: none;*/
+}
