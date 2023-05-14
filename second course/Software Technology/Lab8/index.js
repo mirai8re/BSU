@@ -1,90 +1,45 @@
-// const model = [
-//     {type: 'Address', value }
-// ]
+// Получаем элементы формы по их id
+var form = document.getElementById("taxi-form");
+var address = document.getElementById("address");
+var phone = document.getElementById("phone");
+var date = document.getElementById("date");
+var name = document.getElementById("name");
+var button = document.getElementById("submit");
 
-// Находим форму заказа и добавляем обработчик события submit
-const form = document.querySelector('#taxi-form');
-form.addEventListener('submit', handleSubmit);
-
-// Обработчик события submit
-function handleSubmit(event) {
-    event.preventDefault(); // Отменяем стандартное поведение браузера
-
-    // Получаем значения полей формы
-    const address = form.elements['address'].value;
-    const phone = form.elements['phone'].value;
-    const datetime = form.elements['datetime'].value;
-    const name = form.elements['name'].value;
-
-    // Отправляем данные на сервер
-    const data = {
-        address: address,
-        phone: phone,
-        datetime: datetime,
-        name: name
-    };
-    fetch('/api/order', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            alert('Заказ успешно оформлен!');
-        })
-        .catch(error => {
-            console.error(error);
-            alert('Произошла ошибка при оформлении заказа.');
-        });
-}
-
-
-const taxiForm = document.createElement('form');
-taxiForm.id = 'taxi-form';
-
-const addressLabel = document.createElement('label');
-addressLabel.textContent = 'Адрес:';
-const addressInput = document.createElement('input');
-addressInput.type = 'text';
-addressInput.name = 'address';
-addressInput.required = true;
-addressLabel.appendChild(addressInput);
-
-const phoneLabel = document.createElement('label');
-phoneLabel.textContent = 'Телефон:';
-const phoneInput = document.createElement('input');
-phoneInput.type = 'tel';
-phoneInput.name = 'phone';
-phoneInput.required = true;
-phoneLabel.appendChild(phoneInput);
-
-const dateTimeLabel = document.createElement('label');
-dateTimeLabel.textContent = 'Дата и время:';
-const dateTimeInput = document.createElement('input');
-dateTimeInput.type = 'datetime-local';
-dateTimeInput.name = 'datetime';
-dateTimeInput.required = true;
-dateTimeLabel.appendChild(dateTimeInput);
-
-const nameLabel = document.createElement('label');
-nameLabel.textContent = 'Имя:';
-const nameInput = document.createElement('input');
-nameInput.type = 'text';
-nameInput.name = 'name';
-nameInput.required = true;
-nameLabel.appendChild(nameInput);
-
-const submitButton = document.createElement('input');
-submitButton.type = 'submit';
-submitButton.value = 'Заказать';
-
-taxiForm.appendChild(addressLabel);
-taxiForm.appendChild(phoneLabel);
-taxiForm.appendChild(dateTimeLabel);
-taxiForm.appendChild(nameLabel);
-taxiForm.appendChild(submitButton);
-
-document.body.appendChild(taxiForm);
+// Добавляем обработчик события на кнопку отправки формы
+button.addEventListener("click", function(event) {
+// Предотвращаем стандартное поведение формы (перезагрузку страницы)
+    event.preventDefault();
+// Проверяем, что все поля заполнены
+    if (address.value && phone.value && date.value && name.value) {
+// Создаем объект заказа такси с данными из формы
+        var order = {
+            address: address.value,
+            phone: phone.value,
+            date: date.value,
+            name: name.value
+        };
+// Преобразуем объект заказа в JSON-строку
+        var orderJSON = JSON.stringify(order);
+// Отправляем JSON-строку на сервер с помощью AJAX-запроса
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "https://taxi-order-mironova.web.app"); // Выдуманный адрес сервера
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(orderJSON);
+// Обрабатываем ответ от сервера
+        xhr.onload = function() {
+            if (xhr.status == 200) {
+// Если статус ответа 200 (успешно), то выводим сообщение об успешном заказе
+                alert("Ваш заказ успешно оформлен!");
+// Очищаем поля формы
+                form.reset();
+            } else {
+// Если статус ответа не 200, то выводим сообщение об ошибке
+                alert("Произошла ошибка при оформлении заказа. Пожалуйста, попробуйте еще раз.");
+            }
+        };
+    } else {
+// Если какое-то поле не заполнено, то выводим сообщение о необходимости заполнить все поля
+        alert("Пожалуйста, заполните все поля формы.");
+    }
+});
