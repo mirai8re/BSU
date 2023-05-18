@@ -1,4 +1,102 @@
 create DATABASE LAB13
+-- 1.3 Практика (хранимые процедуры) -самостоятельная работа
+-- 1) Напишите хранимую процедуру, которая выводит данные всех
+-- стран 
+USE LAB9 
+GO 
+CREATE PROC PROC1
+AS
+    BEGIN
+    SELECT [Nazvanie], [Stolica], [PL], [KolNas], [Kontinent]
+    FROM [LAB9].[dbo].[Tabl_Kontinents]
+END 
+    --
+EXEC PROC1 
+DROP PROC if EXISTS PROC3
+--2) Напишите хранимую процедуру, которая принимает число, и возвращает количество цифр в нем через параметр OUTPUT
+GO 
+CREATE PROC PROC2
+@Number INT,
+@Count INT OUTPUT
+AS 
+BEGIN 
+    SET @Count = LEN(CAST(@Number AS VARCHAR(20)))
+END
+--
+DECLARE @DigitCount INT
+EXEC PROC2 @Number = 18, 
+@Count = @DigitCount OUTPUT
+SELECT @DigitCount AS DigitCount
+-- 3) Напишите хранимую процедуру, которая создает таблицу «TestTabl», заполняет ее странами, названия которых начинаются с первой буквой вашей фамилии
+GO 
+CREATE PROC PROC3
+AS 
+BEGIN
+    IF OBJECT_ID('TestTabl', 'U') IS NOT NULL
+            DROP TABLE TestTabl;
+            
+    CREATE TABLE TestTabl (
+        ID INT IDENTITY(1,1),
+        CountryName VARCHAR(100)
+    );
+
+    INSERT INTO TestTabl (CountryName)
+    SELECT Nazvanie
+    FROM Tabl_Kontinents
+    WHERE Nazvanie LIKE 'M%'
+END
+-- 
+EXEC PROC3
+
+-- 2.4 Практика: Определяемые пользователем функции. Самостоятельная работа.
+-- 1) Напишите функцию для возврата списка стран с площадью меньше заданного числа и вызовите ее.
+GO
+CREATE FUNCTION GetCountriesByArea(@MaxArea DECIMAL(10, 2))
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT [Nazvanie] AS CountryName, [PL] AS Area
+    FROM [dbo].[Tabl_Kontinents]
+    WHERE [PL] < @MaxArea
+);
+--
+SELECT *
+FROM dbo.GetCountriesByArea(1000000);
+
+-- 2) Напишите функцию для возврата таблицы с названием страны и плотностью населения, и вызовите ее
+GO 
+CREATE FUNCTION GetCountryPopulationDensity()
+RETURNS TABLE
+AS RETURN
+(
+    SELECT [Nazvanie] AS CountryName, [KolNas] / [PL] AS PopulationDensity
+    FROM [dbo].[Tabl_Kontinents]);
+-- 
+SELECT * 
+FROM dbo.GetCountryPopulationDensity()
+-- 1) Напишите триггер на добавление записи в таблицу «Student». Данный триггер, в случае успешного добавления данных, выводит «Запись добавлена»
+USE Ucheb_7_Mironova
+GO 
+CREATE TRIGGER TRIG1
+ON Student
+FOR INSERT 
+AS
+BEGIN 
+    PRINT 'entry added'
+END
+
+-- 2) Самостоятельно проверьте работу триггера Trig1, для этого добавьте запись в табл. Student
+INSERT INTO [Ucheb_7_Mironova].[dbo].[Student] ([full name], [date], [speciality], [year of admission])
+VALUES ('Миронова Лада Викторовна', '2000-01-01', 'Математика', 2021);
+
+
+
+
+
+
+
+
 -- В вашей, ранее спроектированной БД (индивидуальное задание из Лабораторной работы No4):
 
 -- 1.1.Создать 2 хранимые процедуры, одна из которых будет иметь выходные параметры
