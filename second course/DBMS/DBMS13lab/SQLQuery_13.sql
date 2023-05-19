@@ -90,10 +90,49 @@ END
 INSERT INTO [Ucheb_7_Mironova].[dbo].[Student] ([full name], [date], [speciality], [year of admission])
 VALUES ('Миронова Лада Викторовна', '2000-01-01', 'Математика', 2021);
 
+-- 3) Напишите триггер на удаление записи из таблицы «Student». Данный триггер, при попытке удаления данных, выводит «Нельзя удалить данные»
+USE Ucheb_7_Mironova
+GO
+CREATE TRIGGER TRIG2
+ON [Ucheb_7_Mironova].[dbo].[Student]
+INSTEAD OF DELETE 
+AS
+BEGIN
+    PRINT 'YOU CANNOT DELETE DATA'
+END
+-- 4) Самостоятельно проверьте работу триггера Trig2
+DELETE FROM [Ucheb_7_Mironova].[dbo].[Student]
+WHERE [full name] = 'Миронова Лада Викторовна' AND [date] = '2000-01-01' AND [speciality] = 'Математика' AND [year of admission] = 2021;
 
-
-
-
+-- Создать таблицу «Студент_Архив», которая будет содержать все данные об удаленных Студентах и даты их удаления.
+CREATE TABLE Student_Archive(
+    FullName NVARCHAR(40) NULL,
+    Date DATE NULL,
+    Speciality NVARCHAR(20) NULL,
+    YearOfAdmission INT NULL,
+    DeleteData DATETIME NOT NULL
+)
+GO
+DROP TRIGGER [dbo].[TRIG2];
+-- Написать триггер, который будет фиксировать в таблице «Студент _Архив1» данные студента, удаленного из таблицы «Студенты»
+GO
+CREATE TRIGGER TRIG3
+ON Student 
+INSTEAD OF DELETE 
+AS BEGIN 
+    INSERT Student_Archive 
+    SELECT
+    [full name], 
+    Date,
+    Speciality, 
+    [Year Of Admission],
+    GETDATE() AS DeleteData
+        FROM DELETED
+END
+-- 5 ) Самостоятельно проверьте работу триггера Trig31
+DELETE FROM [Ucheb_7_Mironova].[dbo].[Student]
+WHERE [full name] = 'Миронова Лада Викторовна' AND [date] = '2000-01-01' AND [speciality] = 'Математика' AND [year of admission] = 2021;
+SELECT * FROM Student_Archive;
 
 
 
