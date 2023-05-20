@@ -160,16 +160,8 @@ BEGIN
     FROM Customers
     WHERE CustomerID = @CustomerID
 END
---увидеть результат
-DECLARE @FirstName VARCHAR(50)
-DECLARE @LastName VARCHAR(50)
-DECLARE @Email VARCHAR(50)
-DECLARE @Phone VARCHAR(20)
-DECLARE @CustomerID INT = 1 -- Здесь указывается идентификатор клиента
 
-EXEC GetCustomerByID @CustomerID, @FirstName OUTPUT, @LastName OUTPUT, @Email OUTPUT, @Phone OUTPUT
-SELECT @FirstName AS FirstName, @LastName AS LastName, @Email AS Email, @Phone AS Phone
---
+
 --для получения информации о заказе на основе его идентификатора
 GO
 CREATE PROCEDURE GetOrderDetails
@@ -186,7 +178,9 @@ BEGIN
     FROM Orders
         WHERE OrderID = @OrderID
 END
--- result 
+-- 1.2 Примените ваши две созданные хранимые процедуры для вашей БД 
+
+-- увидеть результат для получения информации о клиенте на основе его идентификатора
 DECLARE @CustomerID_Out INT
 DECLARE @OrderDate_Out DATETIME
 DECLARE @TotalCost_Out DECIMAL(8,2)
@@ -194,7 +188,61 @@ DECLARE @OrderID_In INT = 3
 EXEC GetOrderDetails @OrderID_In, @CustomerID_Out OUTPUT, @OrderDate_Out OUTPUT, @TotalCost_Out OUTPUT
 SELECT @CustomerID_Out AS CustomerID, @OrderDate_Out AS OrderDate, @TotalCost_Out AS TotalCost
 
--- 1.2 Примените ваши две созданные хранимые процедуры для вашей БД ( 2.1Создать 2 определяемые пользователем функции, одна из которых
+--увидеть результат для получения информации о заказе на основе его идентификатора
+DECLARE @FirstName VARCHAR(50)
+DECLARE @LastName VARCHAR(50)
+DECLARE @Email VARCHAR(50)
+DECLARE @Phone VARCHAR(20)
+DECLARE @CustomerID INT = 1 -- Здесь указывается идентификатор клиента
+EXEC GetCustomerByID @CustomerID, @FirstName OUTPUT, @LastName OUTPUT, @Email OUTPUT, @Phone OUTPUT
+SELECT @FirstName AS FirstName, @LastName AS LastName, @Email AS Email, @Phone AS Phone
+
+-- 2.1Создать 2 определяемые пользователем функции, одна из которых
 -- скалярная функция, другая возвращая табличное значение
+-- создается функция GetFullName, которая принимает два параметра @FirstName и @LastName. 
+-- Функция объединяет значения этих параметров в одну строку, представляющую полное имя, 
+-- и возвращает эту строку
+GO
+CREATE FUNCTION GetFullName(
+  @FirstName VARCHAR(50),
+  @LastName VARCHAR(50))
+RETURNS VARCHAR(101)
+AS
+BEGIN
+  DECLARE @FullName VARCHAR(101)
+  SET @FullName = @FirstName + ' ' + @LastName
+  RETURN @FullName
+END
+GO
+
+-- Функция GetCustomerAddresses создана для получения адресов, связанных с указанным идентификатором клиента. 
+-- Функция принимает один параметр @CustomerID, 
+-- который будет использоваться для фильтрации адресов по указанному идентификатору клиента.
+USE PizzaDB
+GO
+CREATE FUNCTION GetCustomerAddresses(
+  @CustomerID INT)
+RETURNS TABLE
+AS
+RETURN(
+  SELECT AddressID, Street, City, State, ZipCode
+  FROM Addresses
+  WHERE CustomerID = @CustomerID)
+GO
+
+
+
 -- 2.2 Примените ваши две созданные функции для вашей БД
+--Вызов функции GetFullName
+DECLARE @FirstName VARCHAR(50) = 'Anna'
+DECLARE @LastName VARCHAR(50) = 'Mironova'
+SELECT dbo.GetFullName(@FirstName, @LastName) AS FullName
+
+--Вызов функции GetCustomerAddresses
+DECLARE @CustomerID INT = 2
+SELECT * FROM GetCustomerAddresses(@CustomerID)
+
+
+
+
 -- 3.1 Создайте два триггера: триггер AFTER и триггер INSTEAD OF 3.2 Примените ваши два созданные триггера для вашей БД
