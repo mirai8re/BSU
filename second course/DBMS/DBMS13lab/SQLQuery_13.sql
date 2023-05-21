@@ -242,7 +242,25 @@ SELECT dbo.GetFullName(@FirstName, @LastName) AS FullName
 DECLARE @CustomerID INT = 2
 SELECT * FROM GetCustomerAddresses(@CustomerID)
 
+-- 3.1 Создайте два триггера: триггер AFTER и триггер INSTEAD OF 
+-- триггер AFTER 
+-- Данный триггер AfterInsertOrder является триггером AFTER INSERT для таблицы Orders в базе данных PizzaDB. 
+-- Триггер срабатывает после вставки новой записи в таблицу Orders.
+-- В данном случае, триггер выполняет простое действие - выводит сообщение "this entry has been added to the table "Orders"" 
+-- с использованием оператора PRINT. 
+-- Таким образом, при каждой вставке новой записи в таблицу Orders, будет выводиться указанное сообщение.
+USE PizzaDB
+GO
+CREATE TRIGGER AfterInsertOrder
+ON Orders
+AFTER INSERT
+AS
+BEGIN
+    -- Тело триггера AFTER
+    PRINT 'this entry has been added to the table "Orders" '
+    
+END
 
 
 
--- 3.1 Создайте два триггера: триггер AFTER и триггер INSTEAD OF 3.2 Примените ваши два созданные триггера для вашей БД
+-- 3.2 Примените ваши два созданные триггера для вашей БД
