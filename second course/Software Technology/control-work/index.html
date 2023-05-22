@@ -1,0 +1,142 @@
+
+<html>
+<head>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: lightblue;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: lightseagreen;
+        }
+
+        img {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+<div>
+<img src="s.png" alt="Anna Mironova">
+</div>
+<div>
+
+</div>
+<div>
+    <br> </br>
+    <br> </br>
+    <h1>Anna Mironova</h1>
+<h2>Addition and multiplication tables</h2></div>
+<p>Enter two numbers for the addition table and two numbers for the multiplication table.</p>
+<input id="num1" type="number" placeholder="First number">
+<br>
+<input id="num2" type="number" placeholder="Second number">
+<br>
+<button id="add" onclick="add()">Add</button>
+<br>
+<button id="multiply" onclick="multiply()">Multiply</button>
+<br>
+<div id="result"></div>
+<script>
+    function add() {
+// Получаем значения из полей ввода
+        var num1 = parseInt(document.getElementById("num1").value);
+        var num2 = parseInt(document.getElementById("num2").value);
+// Проверяем, что они являются числами
+        if (isNaN(num1) || isNaN(num2)) {
+            alert("Please, enter numbers.");
+            return;
+        }
+// Создаем таблицу сложения
+        var table = document.createElement("table");
+// Добавляем заголовок таблицы с числами
+        var tr = document.createElement("tr");
+        var th = document.createElement("th");
+        th.textContent = "+";
+        tr.appendChild(th);
+        for (var i = 0; i <= num2; i++) {
+            var th = document.createElement("th");
+            th.textContent = i;
+            tr.appendChild(th);
+        }
+        table.appendChild(tr);
+// Добавляем строки таблицы с результатами сложения
+        for (var i = 0; i <= num1; i++) {
+            var tr = document.createElement("tr");
+            var th = document.createElement("th");
+            th.textContent = i;
+            tr.appendChild(th);
+            for (var j = 0; j <= num2; j++) {
+                var td = document.createElement("td");
+                td.textContent = i + j;
+                tr.appendChild(td);
+            }
+            table.appendChild(tr);
+        }
+// Очищаем предыдущий результат, если есть
+        document.getElementById("result").innerHTML = "";
+// Добавляем таблицу в элемент с id "result"
+        document.getElementById("result").appendChild(table);
+// Добавляем текст с результатом сложения двух чисел
+        var p = document.createElement("p");
+        p.textContent = "Result of adding " + num1 + " and " + num2 + " is " + (num1 + num2) + ".";
+        document.getElementById("result").appendChild(p);
+    }
+
+    function multiply() {
+// Получаем значения из полей ввода
+        var num1 = parseInt(document.getElementById("num1").value);
+        var num2 = parseInt(document.getElementById("num2").value);
+// Проверяем, что они являются числами
+        if (isNaN(num1) || isNaN(num2)) {
+            alert("Please, enter numbers.");
+            return;
+        }
+// Создаем таблицу умножения
+        var table = document.createElement("table");
+// Добавляем заголовок таблицы с числами
+        var tr = document.createElement("tr");
+        var th = document.createElement("th");
+        th.textContent = "*";
+        tr.appendChild(th);
+        for (var i = 0; i <= num2; i++) {
+            var th = document.createElement("th");
+            th.textContent = i;
+            tr.appendChild(th);
+        }
+        table.appendChild(tr);
+// Добавляем строки таблицы с результатами умножения
+        for (var i = 0; i <= num1; i++) {
+            var tr = document.createElement("tr");
+            var th = document.createElement("th");
+            th.textContent = i;
+            tr.appendChild(th);
+            for (var j = 0; j <= num2; j++) {
+                var td = document.createElement("td");
+                td.textContent = i * j;
+                tr.appendChild(td);
+            }
+            table.appendChild(tr);
+        }
+// Добавляем таблицу в элемент с id "result"
+        document.getElementById("result").appendChild(table);
+// Добавляем текст с результатом умножения двух чисел
+        var p = document.createElement("p");
+        p.textContent = "Result of multiply" + num1 + " and " + num2 + " is " + (num1 * num2) + ".";
+        document.getElementById("result").appendChild(p);
+    }
+</script>
+</body>
+</html>

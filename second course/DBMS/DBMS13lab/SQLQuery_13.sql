@@ -260,7 +260,39 @@ BEGIN
     PRINT 'this entry has been added to the table "Orders" '
     
 END
-
-
+-- триггер INSTEAD OF (InsteadOfInsertOrder) для таблицы Orders заменяет стандартную операцию вставки (INSERT). 
+-- Внутри блока BEGIN и END находится код, который определяет, какие данные будут вставлены в таблицу Orders.
+-- код выполняет простую операцию вставки данных из вставленных строк (inserted) в таблицу Orders. 
+-- Таким образом, все данные, указанные во вставке, будут добавлены в таблицу Orders.
+USE PizzaDB
+GO
+CREATE TRIGGER InsteadOfInsertOrder
+ON Orders
+INSTEAD OF INSERT
+AS
+BEGIN
+    -- Пример кода, заменяющего вставку записи
+    INSERT INTO Orders (CustomerID, OrderDate, TotalCost)
+    SELECT CustomerID, OrderDate, TotalCost
+    FROM inserted
+    WHERE CustomerID IS NOT NULL
+END
 
 -- 3.2 Примените ваши два созданные триггера для вашей БД
+-- Эта команда включит триггер AFTER (AfterInsertOrder) для таблицы Orders, 
+-- что позволит ему выполняться после вставки данных в эту таблицу.
+-- После выполнения этой команды, триггер будет активирован и начнет выполнять свое тело, 
+-- в данном случае выводить сообщение "this entry has been added to the table 'Orders'".
+USE PizzaDB
+GO
+ALTER TABLE Orders
+ENABLE TRIGGER AfterInsertOrder
+
+-- Эта команда включит триггер INSTEAD OF (InsteadOfInsertOrder) для таблицы Orders, 
+-- что позволит ему выполняться при вставке данных в эту таблицу.
+-- После выполнения этой команды, триггер будет активирован и начнет заменять стандартную операцию вставки 
+-- для таблицы Orders со своим собственным кодом.
+USE PizzaDB
+GO
+ALTER TABLE Orders
+ENABLE TRIGGER InsteadOfInsertOrder
