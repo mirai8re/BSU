@@ -1,8 +1,12 @@
 # Temperature Converter
 
-Java program which lets you convert between Celsius, Fahrenheit and, Kelvin.
+ #### :white_check_mark: TASK: 
+
+Java-программа, позволяющая конвертировать градусы
+- Цельсия(°C)
+- Фаренгейта(°F)
+- Кельвина(°K)
 
 ![tttttttttttttttt](https://user-images.githubusercontent.com/86140276/130168364-d0156993-8b84-4eb0-8901-5ac44f02c98e.jpg)
 
-Temperature converter works great like Celsius (°C) to Fahrenheit  (°F), Celsius (°C) to Kelvin (°K), Fahrenheit  (°F) to Celsius (°C), Fahrenheit  (°F) to Kelvin (°K), Kelvin (°K) to Celsius (°C),Kelvin (°K) to Fahrenheit  (°F) and, each other.
-
+Конвертер температуры отлично работает как преобразование Цельсия (°C) в Фаренгейт (°F), Цельсия (°C) в Кельвин (°K), Фаренгейта (°F) в Цельсий (°C), Фаренгейта (°F) в Кельвин (°K), Кельвина (°K) в Цельсий (°C), Кельвина (°K) в Фаренгейт (°F) и др.
