@@ -1,4 +1,4 @@
-# Temperature Converter
+# Temperature Converter(Anna Mironova)
 
  #### :white_check_mark: TASK: 
 
