@@ -1,4 +1,4 @@
-# Temperature Converter(Anna Mironova)
+# Converter(Anna Mironova)
 
 #### :white_check_mark: TASK: 
 Разработать приложение, которое позволяет вычисление тригонометрической функции (арктангенс )
